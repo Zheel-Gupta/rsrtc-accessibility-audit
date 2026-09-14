@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bus Operations Dashboard — RSRTC Staff Portal</title>
+  <style>
+    :root {
+      --ink: #1c2230;
+      --ink-soft: #4a5266;
+      --paper: #f5f4f0;
+      --panel: #ffffff;
+      --line: #dcd9d2;
+      --accent: #1f4e79;
+      --accent-soft: #e3ecf4;
+      --warn: #8a4b16;
+      --warn-soft: #f6e9db;
+      --good: #2f5233;
+      --good-soft: #e4ece4;
+      --bad: #a33b3b;
+      --bad-soft: #f2dede;
+      --focus: #1857b8;
+      --radius: 4px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    a { color: var(--focus); }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: 0;
+      background: var(--ink);
+      color: #fff;
+      padding: 0.75rem 1.25rem;
+      z-index: 100;
+      border-radius: 0 0 var(--radius) 0;
+    }
+    .skip-link:focus { left: 0; }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px; height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--ink);
+      color: #fff;
+      border-bottom: 3px solid var(--accent);
+    }
+    .site-header h1 {
+      font-size: 1.2rem;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.9rem;
+    }
+    .header-user button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: #fff;
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .header-user button:hover { background: rgba(255,255,255,0.12); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 66px);
+    }
+
+    .primary-nav {
+      background: #eceaf0;
+      border-right: 1px solid var(--line);
+      padding: 1.5rem 0;
+    }
+    .primary-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .primary-nav a {
+      display: block;
+      padding: 0.65rem 1.5rem;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.95rem;
+      border-left: 3px solid transparent;
+    }
+    .primary-nav a[aria-current="page"] {
+      color: var(--ink);
+      font-weight: 600;
+      border-left-color: var(--accent);
+      background: #e0e0ea;
+    }
+    .primary-nav a:hover { background: #e0e0ea; }
+
+    main { padding: 2rem; }
+    main > h2 { margin-top: 0; font-size: 1.6rem; }
+    .lede {
+      color: var(--ink-soft);
+      max-width: 62ch;
+      margin-bottom: 2rem;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .summary-cards article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--accent);
+      padding: 1rem 1.25rem;
+    }
+    .summary-cards h3 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.85rem;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+    .summary-cards p {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+
+    .table-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      margin-bottom: 2.5rem;
+    }
+    .table-section h2 {
+      margin: 0;
+      padding: 1.1rem 1.25rem;
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--line);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.92rem;
+    }
+    caption {
+      text-align: left;
+      padding: 0 1.25rem 0.75rem;
+      color: var(--ink-soft);
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.85rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.7rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+    }
+    th[scope="col"] {
+      background: #f1efe9;
+      font-weight: 600;
+    }
+    tbody tr:hover { background: #faf9f6; }
+    .status-pill {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .status-ontime { background: var(--good-soft); color: var(--good); }
+    .status-delayed { background: var(--warn-soft); color: var(--warn); }
+    .status-cancelled { background: var(--bad-soft); color: var(--bad); }
+
+    .row-actions button {
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0.3rem 0.7rem;
+      font-family: inherit;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .row-actions button:hover { background: #f1efe9; }
+
+    .form-section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1.5rem;
+      max-width: 640px;
+    }
+    .form-section h2 { margin-top: 0; font-size: 1.1rem; }
+    fieldset {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem 1.25rem;
+      margin: 0 0 1.25rem 0;
+    }
+    legend {
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-weight: 600;
+      padding: 0 0.4rem;
+      font-size: 0.95rem;
+    }
+    .field { margin-bottom: 1rem; font-family: -apple-system, "Segoe UI", sans-serif; }
+    .field label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .field .hint {
+      display: block;
+      font-weight: 400;
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+    }
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid #b8b4aa;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .required-mark { color: var(--warn); }
+    .submit-row { display: flex; gap: 0.75rem; font-family: -apple-system, "Segoe UI", sans-serif; }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--line);
+      padding: 0.65rem 1.4rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 20, 20, 0.5);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 200;
+    }
+    .modal-overlay.is-open { display: flex; }
+    .modal-dialog {
+      background: var(--panel);
+      max-width: 440px;
+      width: 100%;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      font-family: -apple-system, "Segoe UI", sans-serif;
+    }
+    .modal-dialog h2 {
+      margin-top: 0;
+      font-size: 1.15rem;
+      font-family: "Iowan Old Style", Georgia, serif;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    footer {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--line);
+      padding: 1.25rem 2rem;
+      font-family: -apple-system, "Segoe UI", sans-serif;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+    }
+
+    @media (max-width: 720px) {
+      .layout { grid-template-columns: 1fr; }
+      .primary-nav { border-right: none; border-bottom: 1px solid var(--line); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>RSRTC Staff Portal — Bus Operations</h1>
+    <div class="header-user">
+      <span>Devendra Singh, Depot Supervisor</span>
+      <button type="button">Sign out</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="primary-nav" aria-label="Primary">
+      <ul>
+        <li><a href="#" aria-current="page">Dashboard</a></li>
+        <li><a href="#">Routes</a></li>
+        <li><a href="#">Buses</a></li>
+        <li><a href="#">Bookings</a></li>
+        <li><a href="#">Reports</a></li>
+      </ul>
+    </nav>
+
+    <main id="main-content">
+      <h2>Jaipur depot overview</h2>
+      <p class="lede">Live status of scheduled services out of Jaipur depot for 14 September 2026.</p>
+
+      <section aria-labelledby="summary-heading">
+        <h2 id="summary-heading" class="visually-hidden">Key metrics</h2>
+        <div class="summary-cards">
+          <article>
+            <h3>Buses on road</h3>
+            <p>212</p>
+          </article>
+          <article>
+            <h3>Seats booked today</h3>
+            <p>6,340</p>
+          </article>
+          <article>
+            <h3>On-time performance</h3>
+            <p>88%</p>
+          </article>
+          <article>
+            <h3>Open complaints</h3>
+            <p>14</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="table-section" aria-labelledby="services-heading">
+        <h2 id="services-heading">Today's scheduled services</h2>
+        <table>
+          <caption>Latest 5 services departing Jaipur depot, sorted by departure time.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Route</th>
+              <th scope="col">Bus No.</th>
+              <th scope="col">Departure</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Jaipur → Jodhpur</td>
+              <td>RJ14 PA 4021</td>
+              <td>08:30</td>
+              <td><span class="status-pill status-ontime">On time</span></td>
+              <td class="row-actions"><button type="button">View</button></td>
+            </tr>
+            <tr>
+              <td>Jaipur → Udaipur</td>
+              <td>RJ14 PA 3987</td>
+              <td>09:00</td>
+              <td><span class="status-pill status-delayed">Delayed 20 min</span></td>
+              <td class="row-actions"><button type="button" data-open-modal>View</button></td>
+            </tr>
+            <tr>
+              <td>Jaipur → Kota</td>
+              <td>RJ14 PA 4102</td>
+              <td>09:15</td>
+              <td><span class="status-pill status-ontime">On time</span></td>
+              <td class="row-actions"><button type="button">View</button></td>
+            </tr>
+            <tr>
+              <td>Jaipur → Bikaner</td>
+              <td>RJ14 PA 3860</td>
+              <td>09:45</td>
+              <td><span class="status-pill status-cancelled">Cancelled</span></td>
+              <td class="row-actions"><button type="button">View</button></td>
+            </tr>
+            <tr>
+              <td>Jaipur → Ajmer</td>
+              <td>RJ14 PA 4188</td>
+              <td>10:00</td>
+              <td><span class="status-pill status-ontime">On time</span></td>
+              <td class="row-actions"><button type="button">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="form-section" aria-labelledby="new-route-heading">
+        <h2 id="new-route-heading">Add a scheduled service</h2>
+        <form novalidate>
+          <fieldset>
+            <legend>Route details</legend>
+
+            <div class="field">
+              <label for="from-stop">From stop <span class="required-mark" aria-hidden="true">*</span></label>
+              <input type="text" id="from-stop" name="from-stop" required aria-required="true">
+            </div>
+
+            <div class="field">
+              <label for="to-stop">To stop <span class="required-mark" aria-hidden="true">*</span></label>
+              <input type="text" id="to-stop" name="to-stop" required aria-required="true">
+            </div>
+
+            <div class="field">
+              <label for="journey-date">Journey date</label>
+              <input type="date" id="journey-date" name="journey-date" aria-describedby="date-hint">
+              <span class="hint" id="date-hint">Bookings open up to 30 days in advance.</span>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Service details</legend>
+
+            <div class="field">
+              <label for="bus-number">Bus number <span class="required-mark" aria-hidden="true">*</span></label>
+              <input type="text" id="bus-number" name="bus-number" required aria-required="true">
+            </div>
+
+            <div class="field">
+              <label for="service-type">Service type</label>
+              <select id="service-type" name="service-type">
+                <option value="direct">Direct service</option>
+                <option value="connecting">Connecting service</option>
+              </select>
+            </div>
+          </fieldset>
+
+          <div class="submit-row">
+            <button type="submit" class="btn-primary">Save service</button>
+            <button type="reset" class="btn-secondary">Clear form</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Rajasthan State Road Transport Corporation. Staff portal — internal use only.</p>
+    </footer>
+  </div>
+
+  <div class="modal-overlay" id="service-modal-overlay">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+      <h2 id="modal-title">Jaipur → Udaipur — service details</h2>
+      <p id="modal-desc">Bus RJ14 PA 3987 is delayed by 20 minutes due to traffic near Bhilwara. Revised departure: 09:20. 41 of 45 seats booked.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-modal>Close</button>
+        <button type="button" class="btn-primary">Notify passengers</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var overlay = document.getElementById('service-modal-overlay');
+      var openTriggers = document.querySelectorAll('[data-open-modal]');
+      var closeTriggers = document.querySelectorAll('[data-close-modal]');
+      var lastFocused = null;
+
+      function openModal() {
+        lastFocused = document.activeElement;
+        overlay.classList.add('is-open');
+        overlay.querySelector('[data-close-modal]').focus();
+        document.addEventListener('keydown', onKeydown);
+      }
+
+      function closeModal() {
+        overlay.classList.remove('is-open');
+        document.removeEventListener('keydown', onKeydown);
+        if (lastFocused) lastFocused.focus();
+      }
+
+      function onKeydown(e) {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      }
+
+      openTriggers.forEach(function (btn) {
+        btn.addEventListener('click', openModal);
+      });
+      closeTriggers.forEach(function (btn) {
+        btn.addEventListener('click', closeModal);
+      });
+    })();
+  </script>
+
+</body>
+</html>
