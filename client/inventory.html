@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spare Parts Inventory — RSRTC Staff Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>RSRTC Staff Portal — Spare Parts Inventory</h1>
+    <div class="header-user">
+      <button type="button" class="cart-button" id="cart-button" aria-haspopup="true">
+        Cart <span class="cart-count" id="cart-count">0</span>
+      </button>
+      <span>Devendra Singh, Depot Supervisor</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="primary-nav" aria-label="Primary">
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="#">Routes</a></li>
+        <li><a href="#">Buses</a></li>
+        <li><a href="index.html">Bookings</a></li>
+        <li><a href="inventory.html" aria-current="page">Inventory</a></li>
+      </ul>
+    </nav>
+
+    <main id="main-content">
+      <h2>Spare parts inventory</h2>
+      <p class="lede">Live catalog pulled from the parts supplier API. Search, filter by category, and sort to find what's needed for today's maintenance queue.</p>
+
+      <div class="error-banner" id="error-banner" role="alert">
+        <span id="error-message"></span>
+        <button type="button" id="error-retry">Retry</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="inventory-search">Search parts</label>
+          <input type="search" id="inventory-search" name="inventory-search" placeholder="e.g. jacket, backpack, ring">
+        </div>
+        <div class="field">
+          <label for="inventory-sort">Sort by</label>
+          <select id="inventory-sort" name="inventory-sort">
+            <option value="default">Default</option>
+            <option value="price-asc">Price: low to high</option>
+            <option value="price-desc">Price: high to low</option>
+            <option value="name-asc">Name: A to Z</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="category-tabs" id="category-tabs" role="tablist" aria-label="Filter by category"></div>
+
+      <section aria-label="Product results">
+        <div class="product-grid" id="product-grid"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2026 Rajasthan State Road Transport Corporation. Staff portal — internal use only. Catalog data via FakeStoreAPI.</p>
+    </footer>
+  </div>
+
+  <!-- Cart drawer -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay"></div>
+  <aside class="cart-drawer" id="cart-drawer" aria-label="Shopping cart">
+    <h2>Your cart</h2>
+    <div id="cart-items"></div>
+    <div class="submit-row" style="margin-top: 1.5rem;">
+      <button type="button" class="btn-secondary" id="cart-close">Close</button>
+    </div>
+  </aside>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
