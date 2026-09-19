@@ -14,15 +14,15 @@
     <h1>RSRTC Staff Portal — Bus Operations</h1>
     <div class="header-user">
       <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">Dark mode</button>
-      <span>Devendra Singh, Depot Supervisor</span>
-      <button type="button">Sign out</button>
+      <span id="signed-in-as">Staff</span>
+      <button type="button" id="sign-out-btn">Sign out</button>
     </div>
   </header>
 
   <div class="layout">
     <nav class="primary-nav" aria-label="Primary">
       <ul>
-        <li><a href="#" aria-current="page">Dashboard</a></li>
+        <li><a href="index.html" aria-current="page">Dashboard</a></li>
         <li><a href="#">Routes</a></li>
         <li><a href="#">Buses</a></li>
         <li><a href="#">Bookings</a></li>
@@ -33,7 +33,7 @@
 
     <main id="main-content">
       <h2>Jaipur depot overview</h2>
-      <p class="lede">Live status of scheduled services out of Jaipur depot for 14 September 2026.</p>
+      <p class="lede">Live status of scheduled services out of Jaipur depot. Add, edit, or remove services below — changes are saved to this browser automatically.</p>
 
       <section aria-labelledby="summary-heading">
         <h2 id="summary-heading" class="visually-hidden">Key metrics</h2>
@@ -58,9 +58,9 @@
       </section>
 
       <section class="table-section" aria-labelledby="services-heading">
-        <h2 id="services-heading">Today's scheduled services</h2>
+        <h2 id="services-heading">Scheduled services</h2>
         <table>
-          <caption>Latest 5 services departing Jaipur depot, sorted by departure time.</caption>
+          <caption>Services departing Jaipur depot. Use Edit or Delete to update the schedule.</caption>
           <thead>
             <tr>
               <th scope="col">Route</th>
@@ -70,49 +70,15 @@
               <th scope="col">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Jaipur → Jodhpur</td>
-              <td>RJ14 PA 4021</td>
-              <td>08:30</td>
-              <td><span class="status-pill status-ontime">On time</span></td>
-              <td class="row-actions"><button type="button">View</button></td>
-            </tr>
-            <tr>
-              <td>Jaipur → Udaipur</td>
-              <td>RJ14 PA 3987</td>
-              <td>09:00</td>
-              <td><span class="status-pill status-delayed">Delayed 20 min</span></td>
-              <td class="row-actions"><button type="button" data-open-modal>View</button></td>
-            </tr>
-            <tr>
-              <td>Jaipur → Kota</td>
-              <td>RJ14 PA 4102</td>
-              <td>09:15</td>
-              <td><span class="status-pill status-ontime">On time</span></td>
-              <td class="row-actions"><button type="button">View</button></td>
-            </tr>
-            <tr>
-              <td>Jaipur → Bikaner</td>
-              <td>RJ14 PA 3860</td>
-              <td>09:45</td>
-              <td><span class="status-pill status-cancelled">Cancelled</span></td>
-              <td class="row-actions"><button type="button">View</button></td>
-            </tr>
-            <tr>
-              <td>Jaipur → Ajmer</td>
-              <td>RJ14 PA 4188</td>
-              <td>10:00</td>
-              <td><span class="status-pill status-ontime">On time</span></td>
-              <td class="row-actions"><button type="button">View</button></td>
-            </tr>
+          <tbody id="services-tbody">
+            <!-- Rows rendered dynamically by services.js -->
           </tbody>
         </table>
       </section>
 
       <section class="form-section" aria-labelledby="new-route-heading">
         <h2 id="new-route-heading">Add a scheduled service</h2>
-        <form novalidate>
+        <form id="service-form" novalidate>
           <fieldset>
             <legend>Route details</legend>
 
@@ -151,7 +117,7 @@
           </fieldset>
 
           <div class="submit-row">
-            <button type="submit" class="btn-primary">Save service</button>
+            <button type="submit" class="btn-primary" id="form-submit-btn">Save service</button>
             <button type="reset" class="btn-secondary">Clear form</button>
           </div>
         </form>
@@ -165,14 +131,29 @@
 
   <div class="modal-overlay" id="service-modal-overlay">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
-      <h2 id="modal-title">Jaipur → Udaipur — service details</h2>
-      <p id="modal-desc">Bus RJ14 PA 3987 is delayed by 20 minutes due to traffic near Bhilwara. Revised departure: 09:20. 41 of 45 seats booked.</p>
+      <h2 id="modal-title">Service details</h2>
+      <p id="modal-desc">Select "Edit" on any row to update its route or bus number, or "Delete" to remove it from today's schedule.</p>
       <div class="modal-actions">
         <button type="button" class="btn-secondary" data-close-modal>Close</button>
-        <button type="button" class="btn-primary">Notify passengers</button>
       </div>
     </div>
   </div>
+
+  <script type="module">
+    import { requireAuth, getSession, wireSignOut } from './auth.js';
+    import { initServiceCrud } from './services.js';
+
+    // Guard this page — redirect to login.html if no session exists.
+    requireAuth();
+
+    const session = getSession();
+    if (session) {
+      document.getElementById('signed-in-as').textContent = `Staff ID: ${session.staffId}`;
+    }
+
+    wireSignOut(document.getElementById('sign-out-btn'));
+    initServiceCrud();
+  </script>
 
   <script>
     (function () {
@@ -184,39 +165,6 @@
         root.setAttribute('data-theme', isDark ? 'light' : 'dark');
         toggle.setAttribute('aria-pressed', String(!isDark));
         toggle.textContent = isDark ? 'Dark mode' : 'Light mode';
-      });
-    })();
-
-    (function () {
-      var overlay = document.getElementById('service-modal-overlay');
-      var openTriggers = document.querySelectorAll('[data-open-modal]');
-      var closeTriggers = document.querySelectorAll('[data-close-modal]');
-      var lastFocused = null;
-
-      function openModal() {
-        lastFocused = document.activeElement;
-        overlay.classList.add('is-open');
-        overlay.querySelector('[data-close-modal]').focus();
-        document.addEventListener('keydown', onKeydown);
-      }
-
-      function closeModal() {
-        overlay.classList.remove('is-open');
-        document.removeEventListener('keydown', onKeydown);
-        if (lastFocused) lastFocused.focus();
-      }
-
-      function onKeydown(e) {
-        if (e.key === 'Escape') {
-          closeModal();
-        }
-      }
-
-      openTriggers.forEach(function (btn) {
-        btn.addEventListener('click', openModal);
-      });
-      closeTriggers.forEach(function (btn) {
-        btn.addEventListener('click', closeModal);
       });
     })();
   </script>

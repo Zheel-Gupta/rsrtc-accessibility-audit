@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — RSRTC Staff Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-5);
+    }
+    .login-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-raised);
+      padding: var(--space-6);
+      max-width: 380px;
+      width: 100%;
+    }
+    .login-card h1 {
+      font-size: var(--text-lg);
+      margin: 0 0 var(--space-2) 0;
+    }
+    .login-card p.lede {
+      margin-bottom: var(--space-5);
+    }
+    .login-note {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--color-ink-soft);
+      margin-top: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <h1>RSRTC Staff Portal</h1>
+      <p class="lede">Sign in with your depot credentials to access the operations dashboard.</p>
+
+      <div class="error-banner" id="login-error" role="alert">
+        <span id="login-error-message"></span>
+      </div>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="staff-id">Staff ID <span class="required-mark" aria-hidden="true">*</span></label>
+          <input type="text" id="staff-id" name="staff-id" required aria-required="true" autocomplete="username">
+        </div>
+
+        <div class="field">
+          <label for="staff-password">Password <span class="required-mark" aria-hidden="true">*</span></label>
+          <input type="password" id="staff-password" name="staff-password" required aria-required="true" autocomplete="current-password">
+        </div>
+
+        <div class="submit-row">
+          <button type="submit" class="btn-primary">Sign in</button>
+        </div>
+      </form>
+
+      <p class="login-note">Demo build: any Staff ID and password of 4+ characters signs you in. No real credentials are sent anywhere — this is a simulated, client-side login for demonstration only.</p>
+    </div>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
