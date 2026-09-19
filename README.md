@@ -2,7 +2,7 @@
 
 A production-style internal staff portal for RSRTC (Rajasthan State Road Transport Corporation), built as a full-stack architecture capstone. It combines an accessibility audit of the real RSRTC booking site with an original, semantic, accessible, responsive, and dynamically data-driven application inspired by that audit's findings.
 
-**Live demo:** _add your deployed URL here after publishing (see Deployment below)_
+**Live demo:** https://zheel-gupta.github.io/rsrtc-accessibility-audit/client/login.html
 **Repository:** https://github.com/Zheel-Gupta/rsrtc-accessibility-audit
 
 ---
